@@ -1,0 +1,165 @@
+# =====================================================
+# General Exclusions
+# =====================================================
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*.lock
+
+# Secret files
+.env
+.env.*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Compression and archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# =====================================================
+# Python / Django
+# =====================================================
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Python files
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+
+# SQLite databases (if used)
+*.sqlite3
+db.sqlite3
+
+# Migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# PyCharm
+.idea/
+
+# Django static and media files (if stored locally)
+staticfiles/
+media/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# =====================================================
+# Node.js / Next.js
+# =====================================================
+
+# node_modules
+node_modules/
+**/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Builds
+.next/
+out/
+build/
+dist/
+
+# Cache
+.cache/
+.parcel-cache/
+.next/cache
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# =====================================================
+# Docker
+# =====================================================
+
+# Docker files
+docker-compose.override.yml
+docker-compose*.yml
+Dockerfile
+Dockerfile.*
+
+# Docker volumes and containers
+*.pid
+*.seed
+*.pid.lock
+
+# Docker images
+*.tar
+
+# =====================================================
+# GitHub
+# =====================================================
+
+# Git-specific files
+*.orig
+*.rej
+*.patch
+
+# =====================================================
+# Miscellaneous
+# =====================================================
+
+# Coverage reports
+coverage/
+*.cover
+*.coverage
+*.lcov
+
+# Test results
+test-results/
+junit.xml
+
+# SASS
+.sass-cache/
+
+# Next.js build output
+.next/
+out/
+
+# Ignoring specific backend/frontend directories (if required)
+# /backend/static/
+# /frontend/.next/
