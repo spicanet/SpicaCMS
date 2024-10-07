@@ -41,11 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ckeditor',
+    'ckeditor_uploader',
     'rest_framework',
     'authentication',
     'content',
+    'comments',
     'media_service',
+    'parsing_service',
     'ai_service',
+    'autoposter',
     'admin_service',
 ]
 
@@ -137,7 +142,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -145,9 +154,54 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'run_parsing_every_hour': {
+        'task': 'parsing_service.tasks.run_all_parsing',
+        'schedule': 3600.0,
+    },
+}
+
+CELERY_BEAT_SCHEDULE.update({
+    'process_new_parsed_items_every_10_minutes': {
+        'task': 'ai_service.tasks.process_new_parsed_items',
+        'schedule': 600.0,
+    },
+})
+
+CELERY_BEAT_SCHEDULE.update({
+    'run_autoposting_every_10_minutes': {
+        'task': 'autoposter.tasks.run_autoposting',
+        'schedule': 600.0,
+    },
+})
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# CKEditor configuration
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'skin': 'moono-dark',
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        'uiColor': '#000',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'],
+            ['Link', 'Unlink', 'Image', 'CodeSnippet'],
+            ['Undo', 'Redo'], ['Source']
+        ],
+        'extraPlugins': ','.join(['codesnippet']),
+    },
+}
+
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
