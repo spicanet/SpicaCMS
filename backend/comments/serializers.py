@@ -1,18 +1,16 @@
 # backend/comments/serializers.py
 
 from rest_framework import serializers
-from django.contrib.contenttypes.models import ContentType
 from .models import Comment
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
     replies = serializers.SerializerMethodField(read_only=True)
-    is_generated = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Comment
         fields = ['id', 'user', 'text', 'created_at', 'replies', 'parent', 'content_type', 'object_id']
-        read_only_fields = ['user', 'created_at', 'replies', 'is_generated']
+        read_only_fields = ['user', 'created_at', 'replies']
 
     def get_replies(self, obj):
         if obj.replies.exists():

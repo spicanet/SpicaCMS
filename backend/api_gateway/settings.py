@@ -15,6 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import logging
 import logging.config
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,15 +44,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'django_celery_beat',
+    'django_extensions',
+    'rest_framework',
     'ckeditor',
     'ckeditor_uploader',
-    'rest_framework',
-    'authentication',
+    # 'django-rest-passwordreset',
     'content',
     'comments',
     'media_service',
-    'admin_service',
+    'users',
+    'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +109,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+AUTH_USER_MODEL = 'users.User'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    # Дополнительные настройки по необходимости
 }
 
 
@@ -160,48 +173,31 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-CELERY_BEAT_SCHEDULE = {
-    'run_parsing_every_hour': {
-        'task': 'parsing_service.tasks.run_all_parsing',
-        'schedule': 3600.0,
-    },
-}
-
-CELERY_BEAT_SCHEDULE.update({
-    'process_new_parsed_items_every_10_minutes': {
-        'task': 'ai_service.tasks.process_new_parsed_items',
-        'schedule': 600.0,
-    },
-})
-
-CELERY_BEAT_SCHEDULE.update({
-    'run_autoposting_every_10_minutes': {
-        'task': 'autoposter.tasks.run_autoposting',
-        'schedule': 600.0,
-    },
-})
-
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# CKEditor configuration
+# Настройки CKEditor
 CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono-dark',
-        'toolbar': 'full',
+        'toolbar': 'full',  # Полный набор инструментов
         'height': 300,
         'width': '100%',
-        'uiColor': '#000',
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
-            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'],
-            ['Link', 'Unlink', 'Image', 'CodeSnippet'],
-            ['Undo', 'Redo'], ['Source']
-        ],
-        'extraPlugins': ','.join(['codesnippet']),
-    },
+        'extraPlugins': ','.join([
+            'uploadimage',  # Позволяет загружать изображения
+            'image2',       # Улучшенная поддержка изображений
+            'codesnippet',  # Поддержка вставки кода
+        ]),
+        'removePlugins': 'stylesheetparser',  # Удаление плагина парсера стилей
+        'allowedContent': True,  # Позволяет вставлять любой контент (опционально)
+        'filebrowserBrowseUrl': '/ckeditor/browse/',
+        'filebrowserUploadUrl': '/ckeditor/upload/',
+        'filebrowserImageUploadUrl': '/ckeditor/upload/',
+        'codeSnippet_theme': 'monokai_sublime',  # Тема для вставки кода
+    }
 }
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')

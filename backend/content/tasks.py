@@ -2,7 +2,7 @@
 
 from celery import shared_task
 from .models import AutomationTemplate, News, Article, ArticleCategory, ArticleTag, NewsCategory, NewsTag
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 import requests
 from lxml import html
 from datetime import datetime
@@ -22,6 +22,8 @@ import markdown
 logger = logging.getLogger('automation')
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+User = get_user_model()
 
 def markdown_to_html(markdown_text):
     # Convert markdown to HTML

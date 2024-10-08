@@ -74,17 +74,8 @@ class NewsSerializer(serializers.ModelSerializer):
             'galleries', 'gallery_ids',
             'audio_files', 'audio_file_ids',
             'video_files', 'video_file_ids',
-            'comments',
         ]
         read_only_fields = ['slug', 'published_at', 'updated_at']
-
-    def get_comments(self, obj):
-        comments = Comment.objects.filter(
-            content_type=ContentType.objects.get_for_model(News),
-            object_id=obj.id,
-            parent__isnull=True
-        )
-        return CommentSerializer(comments, many=True).data
 
 class ArticleSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
@@ -124,13 +115,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'galleries', 'gallery_ids',
             'audio_files', 'audio_file_ids',
             'video_files', 'video_file_ids',
-            'comments',
         ]
         read_only_fields = ['slug', 'published_at', 'updated_at']
-
-    def get_comments(self, obj):
-        comments = Comment.objects.filter(content_type=ContentType.objects.get_for_model(Article), object_id=obj.id, parent__isnull=True)
-        return CommentSerializer(comments, many=True).data
 
 class PageSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)

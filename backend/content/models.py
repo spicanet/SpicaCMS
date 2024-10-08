@@ -1,13 +1,15 @@
 # backend/content/models.py
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from media_service.models import Image, Audio, Video, Gallery
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 import json
 from django.utils import timezone
+
+User = get_user_model()
 
 class NewsCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -81,6 +83,9 @@ class News(models.Model):
     class Meta:
         verbose_name = "News"
         verbose_name_plural = "News"
+        permissions = [
+            ("publish_news", "Can publish news"),
+        ]
 
     def __str__(self):
         return self.title
@@ -118,6 +123,9 @@ class Article(models.Model):
     class Meta:
         verbose_name = "Article"
         verbose_name_plural = "Articles"
+        permissions = [
+            ("publish_article", "Can publish article"),
+        ]
 
     def __str__(self):
         return self.title
@@ -146,6 +154,9 @@ class Page(models.Model):
     class Meta:
         verbose_name = "Page"
         verbose_name_plural = "Pages"
+        permissions = [
+            ("publish_page", "Can publish page"),
+        ]
 
     def __str__(self):
         return self.title
