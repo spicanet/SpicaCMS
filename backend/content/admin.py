@@ -8,10 +8,18 @@ from .models import (
     NewsCategory,
     NewsTag,
     ArticleCategory,
-    ArticleTag
+    ArticleTag,
+    AutomationTemplate
 )
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
+from .forms import AutomationTemplateForm
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from django.http import HttpResponseRedirect
+
 
 class NewsAdminForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
@@ -82,3 +90,45 @@ class ArticleCategoryAdmin(admin.ModelAdmin):
 class ArticleTagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
+
+class AutomationTemplateForm(forms.ModelForm):
+    class Meta:
+        model = AutomationTemplate
+        fields = [
+            'name',
+            'content_type',
+            'site_url',
+            'list_page_url',
+            'pagination_xpath',
+            'article_links_xpath',
+            'title_xpath',
+            'content_xpath',
+            'featured_image_xpath',
+            'title_prompt',
+            'content_prompt',
+            'author',
+            'tags_xpath',
+            'categories_xpath',
+            'is_active',
+            'schedule',
+        ]
+        widgets = {
+            'title_prompt': forms.Textarea(attrs={'rows': 4}),
+            'content_prompt': forms.Textarea(attrs={'rows': 4}),
+            'schedule': forms.TextInput(attrs={'placeholder': 'CRON expression'}),
+        }
+
+@admin.register(AutomationTemplate)
+class AutomationTemplateAdmin(admin.ModelAdmin):
+    form = AutomationTemplateForm
+    list_display = ('name', 'content_type', 'site_url', 'is_active', 'last_run')
+    list_filter = ('is_active', 'content_type')
+    search_fields = ('name', 'site_url')
+    actions = ['run_automation_now']
+
+    def run_automation_now(self, request, queryset):
+        for template in queryset:
+            from .tasks import run_automation
+            run_automation.delay(template.id)
+        self.message_user(request, "Automation tasks have been scheduled to run.")
+    run_automation_now.short_description = "Run selected automation templates now"

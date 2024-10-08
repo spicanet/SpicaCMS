@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from media_service.models import Image, Audio, Video, Gallery
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import json
+from django.utils import timezone
 
 class NewsCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -73,6 +76,8 @@ class News(models.Model):
     audio_files = models.ManyToManyField(Audio, related_name='news', blank=True)
     video_files = models.ManyToManyField(Video, related_name='news', blank=True)
 
+    source_url = models.URLField(blank=True, null=True)
+
     class Meta:
         verbose_name = "News"
         verbose_name_plural = "News"
@@ -108,6 +113,8 @@ class Article(models.Model):
     audio_files = models.ManyToManyField(Audio, related_name='articles', blank=True)
     video_files = models.ManyToManyField(Video, related_name='articles', blank=True)
 
+    source_url = models.URLField(blank=True, null=True)
+
     class Meta:
         verbose_name = "Article"
         verbose_name_plural = "Articles"
@@ -142,3 +149,85 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class AutomationTemplate(models.Model):
+    CONTENT_TYPE_CHOICES = (
+        ('news', 'News'),
+        ('article', 'Article'),
+    )
+
+    name = models.CharField(max_length=255)
+    content_type = models.CharField(
+        max_length=10,
+        choices=CONTENT_TYPE_CHOICES,
+        default='news',
+        help_text="Select whether to create News or Article entries."
+    )
+    site_url = models.URLField(help_text="Base URL of the site to parse.")
+    list_page_url = models.URLField(help_text="URL of the page containing the list of articles.")
+    pagination_xpath = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="XPath expression to the pagination links (if any)."
+    )
+    article_links_xpath = models.CharField(
+        max_length=255,
+        help_text="XPath expression to the article links on the list page."
+    )
+    title_xpath = models.CharField(
+        max_length=255,
+        help_text="XPath expression to the article title."
+    )
+    content_xpath = models.CharField(
+        max_length=255,
+        help_text="XPath expression to the article content."
+    )
+    featured_image_xpath = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="XPath expression to the featured image URL."
+    )
+    title_prompt = models.TextField(
+        blank=True,
+        null=True,
+        help_text="AI prompt for rewriting the title."
+    )
+    content_prompt = models.TextField(
+        blank=True,
+        null=True,
+        help_text="AI prompt for rewriting the content."
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='automation_templates',
+        help_text="Select an existing author."
+    )
+    tags_xpath = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="XPath expression to the article tags."
+    )
+    categories_xpath = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="XPath expression to the article categories."
+    )
+    is_active = models.BooleanField(default=True)
+    schedule = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="CRON expression for scheduling the automation."
+    )
+    last_run = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name

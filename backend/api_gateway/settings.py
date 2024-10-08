@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import logging
+import logging.config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
@@ -48,9 +51,6 @@ INSTALLED_APPS = [
     'content',
     'comments',
     'media_service',
-    'parsing_service',
-    'ai_service',
-    'autoposter',
     'admin_service',
 ]
 
@@ -205,3 +205,46 @@ CKEDITOR_CONFIGS = {
 }
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'automation_file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'automation.log'),
+            'formatter': 'verbose',
+        },
+        'django_file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'django_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'automation': {
+            'handlers': ['console', 'automation_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

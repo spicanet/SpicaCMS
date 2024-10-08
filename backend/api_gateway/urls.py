@@ -25,8 +25,6 @@ urlpatterns = [
     path('api/content/', include('content.urls')),
     path('api/comments/', include('comments.urls')),
     path('api/media/', include('media_service.urls')),
-    path('api/parsing_service/', include('parsing_service.urls')),
-    # path('api/ai/', include('ai_service.urls')),
     # path('api/admin_service/', include('admin_service.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
