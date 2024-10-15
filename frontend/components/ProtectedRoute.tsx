@@ -1,4 +1,5 @@
-// ./components/ProtectedRoute.tsx
+// frontend/components/ProtectedRoute.tsx
+
 'use client';
 
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +17,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }, [user, router]);
 
   if (user === null) {
-    return <p>Загрузка...</p>;
+    return <p>Loading...</p>;
   }
 
   return <>{children}</>;

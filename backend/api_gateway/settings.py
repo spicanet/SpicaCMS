@@ -72,7 +72,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Адрес вашего фронтенда
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -146,7 +146,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
-    # Дополнительные настройки по необходимости
 }
 
 
@@ -207,27 +206,27 @@ CELERY_RESULT_SERIALIZER = 'json'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# Настройки CKEditor
+# CKEditor settings
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono-dark',  # Используемая тема
-        'toolbar': 'full',  # Полный набор инструментов
+        'skin': 'moono-dark',  # Used theme
+        'toolbar': 'full',  # Full toolbar
         'height': 300,
         'width': '100%',
         'extraPlugins': ','.join([
-            'uploadimage',  # Позволяет загружать изображения
-            'image2',       # Улучшенная поддержка изображений
-            'codesnippet',  # Поддержка вставки кода
+            'uploadimage',  # Allows image uploads
+            'image2',       # Enhanced image support
+            'codesnippet',  # Code snippet support
         ]),
-        'removePlugins': 'stylesheetparser',  # Удаление плагина парсера стилей
-        'allowedContent': True,  # Позволяет вставлять любой контент (опционально)
+        'removePlugins': 'stylesheetparser',  # Remove stylesheet parser plugin
+        'allowedContent': True,  # Allows any content (optional)
         'filebrowserBrowseUrl': '/ckeditor/browse/',
         'filebrowserUploadUrl': '/ckeditor/upload/',
         'filebrowserImageUploadUrl': '/ckeditor/upload/',
-        'codeSnippet_theme': 'monokai_sublime',  # Тема для вставки кода
+        'codeSnippet_theme': 'monokai_sublime',  # Theme for code snippets
     }
 }
 

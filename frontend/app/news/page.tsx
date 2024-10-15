@@ -1,4 +1,5 @@
-// ./app/news/page.tsx
+// frontend/app/news/page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +12,6 @@ interface News {
   content: string;
   author: string;
   published_at: string;
-  // Добавьте другие поля по необходимости
 }
 
 export default function NewsPage() {
@@ -25,7 +25,7 @@ export default function NewsPage() {
         const response = await api.get('/content/news/');
         setNews(response.data);
       } catch (err) {
-        setError('Не удалось загрузить новости');
+        setError('Failed to load news');
       } finally {
         setLoading(false);
       }
@@ -33,12 +33,12 @@ export default function NewsPage() {
     fetchNews();
   }, []);
 
-  if (loading) return <p className="p-4">Загрузка...</p>;
+  if (loading) return <p className="p-4">Loading...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
 
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Новости</h1>
+      <h1 className="mb-4 text-2xl font-bold">News</h1>
       <ul>
         {news.map((item) => (
           <li key={item.id} className="mb-4">
@@ -47,7 +47,7 @@ export default function NewsPage() {
                 {item.title}
               </a>
             </h2>
-            <p className="text-sm text-gray-500">Автор: {item.author} | Опубликовано: {new Date(item.published_at).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-500">Author: {item.author} | Posted: {new Date(item.published_at).toLocaleDateString()}</p>
             <div dangerouslySetInnerHTML={{ __html: item.content }} className="mt-2 text-gray-700" />
           </li>
         ))}

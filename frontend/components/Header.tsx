@@ -1,4 +1,5 @@
-// ./components/Header.tsx
+// frontend/components/Header.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -18,16 +19,16 @@ export default function Header() {
     <header className="flex items-center justify-between p-4 bg-gray-800 text-white">
       <Link href="/" className="text-lg font-bold">SpicaCMS</Link>
       <nav>
-        <Link href="/news" className="mr-4">Новости</Link>
+        <Link href="/news" className="mr-4">News</Link>
         {user ? (
           <>
-            <Link href="/dashboard" className="mr-4">Панель управления</Link>
+            <Link href="/dashboard" className="mr-4">Dashboard</Link>
             <button onClick={handleLogout} className="px-3 py-1 bg-red-500 rounded hover:bg-red-600">
               Выйти
             </button>
           </>
         ) : (
-          <Link href="/login" className="px-3 py-1 bg-blue-500 rounded hover:bg-blue-600">Войти</Link>
+          <Link href="/login" className="px-3 py-1 bg-blue-500 rounded hover:bg-blue-600">Login</Link>
         )}
       </nav>
     </header>

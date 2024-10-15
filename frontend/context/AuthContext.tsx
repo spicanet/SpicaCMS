@@ -1,4 +1,5 @@
-// ./context/AuthContext.tsx
+// frontend/context/AuthContext.tsx
+
 'use client';
 
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
@@ -20,7 +21,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
-          // Предполагается, что есть эндпоинт для получения текущего пользователя
           const response = await api.get('/users/users/me/');
           setUser(response.data);
         } catch (error) {
@@ -37,11 +37,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await api.post('/users/token/', { username, password });
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      // Получение данных пользователя
       const userResponse = await api.get('/users/users/me/');
       setUser(userResponse.data);
     } catch (error) {
-      throw new Error('Неверные имя пользователя или пароль');
+      throw new Error('Invalid username or password');
     }
   };
 
@@ -60,6 +59,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth должен использоваться внутри AuthProvider');
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
