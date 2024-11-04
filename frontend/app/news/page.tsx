@@ -24,7 +24,7 @@ export default function NewsPage() {
       try {
         const response = await api.get('/content/news/');
         setNews(response.data);
-      } catch (err) {
+      } catch {
         setError('Failed to load news');
       } finally {
         setLoading(false);

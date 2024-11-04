@@ -2,7 +2,6 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import api from '../../../utils/api';
 
@@ -16,7 +15,6 @@ interface News {
 }
 
 export default function NewsDetailPage({ params }: { params: { slug: string } }) {
-  const router = useRouter();
   const { slug } = params;
   const [news, setNews] = useState<News | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,7 +29,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
         } else {
           setError('News not found');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to load news');
       } finally {
         setLoading(false);
