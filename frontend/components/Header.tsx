@@ -3,12 +3,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '../context/AuthContext';
+import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthContext();
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -16,21 +18,27 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-800 text-white">
-      <Link href="/" className="text-lg font-bold">SpicaCMS</Link>
-      <nav>
-        <Link href="/news" className="mr-4">News</Link>
-        {user ? (
-          <>
-            <Link href="/dashboard" className="mr-4">Dashboard</Link>
-            <button onClick={handleLogout} className="px-3 py-1 bg-red-500 rounded hover:bg-red-600">
-              Выйти
-            </button>
-          </>
-        ) : (
-          <Link href="/login" className="px-3 py-1 bg-blue-500 rounded hover:bg-blue-600">Login</Link>
-        )}
-      </nav>
+    <header className="bg-navigation text-white">
+      <div className="container mx-auto flex items-center justify-between p-4">
+        <Link href="/" className="text-lg font-bold">SpicaCMS</Link>
+        <nav className="flex items-center space-x-4">
+          <Link href="/news" className="hover:text-gray-300">News</Link>
+          {user ? (
+            <>
+              <Link href="/dashboard" className="hover:text-gray-300">Dashboard</Link>
+              <button onClick={handleLogout} className="px-3 py-1 bg-primary rounded hover:bg-secondary">
+                Выйти
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="px-3 py-1 bg-primary rounded hover:bg-secondary">Login</Link>
+          )}
+          {/* Кнопка переключения темы */}
+          <button onClick={toggleTheme} className="px-3 py-1 bg-primary rounded hover:bg-secondary">
+            {theme === 'light' ? 'Темная тема' : 'Светлая тема'}
+          </button>
+        </nav>
+      </div>
     </header>
   );
 }

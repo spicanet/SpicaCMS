@@ -21,14 +21,15 @@ from .serializers import (
 )
 
 class NewsViewSet(viewsets.ModelViewSet):
-    queryset = News.objects.all().order_by('-published_at')
     serializer_class = NewsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return NewsSerializer
-        return NewsSerializer
+    def get_queryset(self):
+        queryset = News.objects.all().order_by('-published_at')
+        slug = self.request.query_params.get('slug', None)
+        if slug is not None:
+            queryset = queryset.filter(slug=slug)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

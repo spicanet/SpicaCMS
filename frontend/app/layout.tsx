@@ -2,9 +2,11 @@
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { AuthProvider } from '../context/AuthContext'
-import Header from '../components/Header'
+import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import Header from '@/components/Header';
 import "./globals.css";
+import NextTopLoader from 'nextjs-toploader';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,12 +31,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader 
+          color="#FF6B00"
+          shadow="0 0 10px #FF6B00,0 0 5px #FF6B00"
+        />
         <AuthProvider>
-          <Header />
-          <main>{children}</main>
+          <ThemeProvider>
+            <Header />
+            <main>{children}</main>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

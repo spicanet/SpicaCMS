@@ -1,57 +1,55 @@
 // frontend/app/news/page.tsx
 
-'use client';
+import NewsGrid from '@/components/NewsGrid';
+import { fetchFilteredNews } from '@/services/newsService';
+import { News, ApiResponse } from '@/types/news';
 
-import { useEffect, useState } from 'react';
-import api from '../../utils/api';
-
-interface News {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  author: string;
-  published_at: string;
+interface NewsPageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function NewsPage() {
-  const [news, setNews] = useState<News[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+export default async function NewsPage({ searchParams }: NewsPageProps) {
+  const category = searchParams.category ? String(searchParams.category) : undefined;
+  const tag = searchParams.tag ? String(searchParams.tag) : undefined;
+  const author = searchParams.author ? String(searchParams.author) : undefined;
+  const startDate = searchParams.start_date ? String(searchParams.start_date) : undefined;
+  const endDate = searchParams.end_date ? String(searchParams.end_date) : undefined;
+  const page = searchParams.page ? parseInt(String(searchParams.page), 10) : 1;
+  const itemsPerPage = 30;
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const response = await api.get('/content/news/');
-        setNews(response.data);
-      } catch {
-        setError('Failed to load news');
-      } finally {
-        setLoading(false);
-      }
+  const dateRange = startDate && endDate ? { start: startDate, end: endDate } : undefined;
+
+  try {
+    const params: any = {
+      page,
+      limit: itemsPerPage,
     };
-    fetchNews();
-  }, []);
 
-  if (loading) return <p className="p-4">Loading...</p>;
-  if (error) return <p className="p-4 text-red-500">{error}</p>;
+    if (category) params.category = category;
+    if (tag) params.tag = tag;
+    if (author) params.author = author;
+    if (dateRange) {
+      params.start_date = dateRange.start;
+      params.end_date = dateRange.end;
+    }
 
-  return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">News</h1>
-      <ul>
-        {news.map((item) => (
-          <li key={item.id} className="mb-4">
-            <h2 className="text-xl font-semibold">
-              <a href={`/news/${item.slug}`} className="text-blue-600 hover:underline">
-                {item.title}
-              </a>
-            </h2>
-            <p className="text-sm text-gray-500">Author: {item.author} | Posted: {new Date(item.published_at).toLocaleDateString()}</p>
-            <div dangerouslySetInnerHTML={{ __html: item.content }} className="mt-2 text-gray-700" />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    const data: ApiResponse<News> = await fetchFilteredNews(params);
+
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="mb-4 text-2xl font-bold">Новости</h1>
+        <NewsGrid
+          columns={3}
+          itemsPerPage={itemsPerPage}
+          showPaginator={true}
+          category={category}
+          tag={tag}
+          author={author}
+          dateRange={dateRange}
+        />
+      </div>
+    );
+  } catch (error: any) {
+    return <p className="p-4 text-red-500">{error.message || 'Ошибка при загрузке новостей'}</p>;
+  }
 }
