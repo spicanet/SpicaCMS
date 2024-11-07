@@ -36,7 +36,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
     const data: ApiResponse<News> = await fetchFilteredNews(params);
 
     return (
-      <div className="container mx-auto p-6">
+      <>
         <h1 className="mb-4 text-2xl font-bold">Новости</h1>
         <NewsGrid
           columns={3}
@@ -47,7 +47,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
           author={author}
           dateRange={dateRange}
         />
-      </div>
+      </>
     );
   } catch (error: any) {
     return <p className="p-4 text-red-500">{error.message || 'Ошибка при загрузке новостей'}</p>;

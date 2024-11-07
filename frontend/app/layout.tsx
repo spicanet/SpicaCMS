@@ -43,7 +43,11 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <Header />
-            <main>{children}</main>
+            <main>
+              <div className="container mx-auto p-6">
+                {children}
+              </div>
+            </main>
           </ThemeProvider>
         </AuthProvider>
       </body>
