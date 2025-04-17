@@ -2,7 +2,7 @@
 
 'use client';
 
-import Link from 'next/link';
+import React from 'react';
 
 interface PaginatorProps {
   totalPages: number;

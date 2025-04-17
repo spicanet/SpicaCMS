@@ -18,11 +18,12 @@ export const useAuth = () => {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
       } catch (err: any) {
-        if (axios.isAxiosError(err) && err.response) {
-          setError(err.response.data.detail || 'Ошибка при получении пользователя');
-        } else {
-          setError('Ошибка при получении пользователя');
+        if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
+          // Не аутентифицирован, разлогиниваемся
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
         }
+        setError(err.response?.data?.detail || 'Ошибка при получении пользователя');
       } finally {
         setLoading(false);
       }

@@ -15,14 +15,15 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
   const startDate = searchParams.start_date ? String(searchParams.start_date) : undefined;
   const endDate = searchParams.end_date ? String(searchParams.end_date) : undefined;
   const page = searchParams.page ? parseInt(String(searchParams.page), 10) : 1;
-  const itemsPerPage = 30;
-
+  const itemsPerPage = searchParams.items_per_page ? parseInt(String(searchParams.items_per_page), 10) : 30;
+  const limit = searchParams.limit ? parseInt(String(searchParams.limit), 10) : undefined;
   const dateRange = startDate && endDate ? { start: startDate, end: endDate } : undefined;
 
   try {
     const params: any = {
       page,
-      limit: itemsPerPage,
+      items_per_page: itemsPerPage,
+      limit: limit,
     };
 
     if (category) params.category = category;
@@ -46,6 +47,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
           tag={tag}
           author={author}
           dateRange={dateRange}
+          limit={limit}
         />
       </>
     );

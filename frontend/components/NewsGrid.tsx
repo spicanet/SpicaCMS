@@ -12,7 +12,7 @@ import { fetchFilteredNews } from '@/services/newsService';
 
 interface NewsGridProps {
   columns: number;
-  itemsPerPage: number;
+  itemsPerPage?: number;
   showPaginator: boolean;
   category?: string;
   tag?: string;
@@ -22,7 +22,7 @@ interface NewsGridProps {
 
 const NewsGrid: React.FC<NewsGridProps> = ({
   columns,
-  itemsPerPage,
+  itemsPerPage = 30,
   showPaginator,
   category,
   tag,
@@ -32,14 +32,17 @@ const NewsGrid: React.FC<NewsGridProps> = ({
   const [news, setNews] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchNewsData = async () => {
+      setLoading(true);
+      setError('');
       try {
         const params: any = {
           page: currentPage,
-          limit: itemsPerPage,
+          page_size: itemsPerPage,
         };
 
         if (category) params.category = category;
@@ -55,6 +58,8 @@ const NewsGrid: React.FC<NewsGridProps> = ({
         setTotalPages(Math.ceil(data.count / itemsPerPage));
       } catch (err: any) {
         setError(err.message || 'Неизвестная ошибка');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -65,6 +70,10 @@ const NewsGrid: React.FC<NewsGridProps> = ({
     setCurrentPage(page);
   };
 
+  if (loading) {
+    return <p className="p-4">Загрузка...</p>;
+  }
+
   if (error) {
     return <p className="p-4 text-red-500">{error}</p>;
   }
@@ -72,12 +81,12 @@ const NewsGrid: React.FC<NewsGridProps> = ({
   return (
     <div>
       <div
-        className={`grid gap-6 ${
+        className={`grid gap-6 grid-cols-1 md:grid-cols-2 ${
           columns === 1
-            ? 'grid-cols-1'
+            ? 'lg:grid-cols-1'
             : columns === 2
-            ? 'grid-cols-2'
-            : 'grid-cols-3'
+            ? 'lg:grid-cols-2'
+            : 'lg:grid-cols-3'
         }`}
       >
         {news.map((item: News) => (

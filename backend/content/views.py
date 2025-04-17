@@ -20,19 +20,31 @@ from .serializers import (
     ArticleTagSerializer
 )
 
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
+class CustomPagination(PageNumberPagination):
+    page_size_query_param = 'items_per_page'
+    max_page_size = 100
+
+class CustomPagination(PageNumberPagination):
+    page_size = 30  # Дефолтное количество элементов на странице
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class NewsViewSet(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         queryset = News.objects.all().order_by('-published_at')
-        slug = self.request.query_params.get('slug', None)
-        tag = self.request.query_params.get('tag', None)
-        category = self.request.query_params.get('category', None)
-        author = self.request.query_params.get('author', None)
-        start_date = self.request.query_params.get('start_date', None)
-        end_date = self.request.query_params.get('end_date', None)
-        limit = self.request.query_params.get('limit', None)
+        slug = self.request.query_params.get('slug')
+        tag = self.request.query_params.get('tag')
+        category = self.request.query_params.get('category')
+        author = self.request.query_params.get('author')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
 
         if slug:
             queryset = queryset.filter(slug=slug)
@@ -48,14 +60,32 @@ class NewsViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(published_at__date__gte=start_date)
         elif end_date:
             queryset = queryset.filter(published_at__date__lte=end_date)
-        if limit:
-            try:
-                limit = int(limit)
-                queryset = queryset[:limit]
-            except ValueError:
-                pass  # Игнорировать некорректное значение limit
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        pagination = self.pagination_class()
+        page = pagination.paginate_queryset(queryset, request)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return pagination.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
